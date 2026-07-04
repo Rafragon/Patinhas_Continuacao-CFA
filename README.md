@@ -1,6 +1,6 @@
 # Funcionamento Técnico do Dispositivo - Patinhas-CFA
 
-"Este documento detalha o funcionamento interno, a eletrônica, os algoritmos embarcados e os protocolos de comunicação do dispositivo IoT (coleira inteligente). Esta implementação é uma evolução direta do [projeto original](https://github.com/willianjsf/Patinhas-CFA/tree/main), estendendo as funcionalidades de hardware e contagem de passos com modelos de Machine Learning para classificação comportamental na borda."
+Este documento detalha o funcionamento interno, a eletrônica, os algoritmos embarcados e os protocolos de comunicação do dispositivo IoT (coleira inteligente). Esta implementação é uma evolução direta do [Patinhas](https://github.com/willianjsf/Patinhas-CFA/tree/main), estendendo as funcionalidades de hardware e contagem de passos com modelos de Machine Learning para classificação comportamental na borda.
 ---
 
 ## 1. Arquitetura de Hardware e Conexões
