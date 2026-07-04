@@ -1,0 +1,56 @@
+{
+  "pets": [
+    {
+      "nome": "Snoopy",
+      "pesoKg": 10,
+      "porte": "pequeno",
+      "idadeAnos": 5,
+      "energia": "media",
+      "castrado": true,
+      "temProblemaSaude": false,
+      "objetivo": "manutencao",
+      "ambienteRuim": false,
+      "cor": "preto e branco",
+      "fotoSrc": "https://iili.io/fBW370N.md.jpg",
+      "passos": [
+        {
+          "data": "2025-11-11",
+          "num_passos": 2309
+        },
+        {
+          "num_passos": 1651,
+          "data": "2025-11-12"
+        },
+        {
+          "data": "2025-11-13",
+          "num_passos": 1235
+        },
+        {
+          "data": "2025-11-14",
+          "num_passos": 1465
+        },
+        {
+          "data": "2025-11-15",
+          "num_passos": 2014
+        },
+        {
+          "data": "2025-11-26",
+          "num_passos": 1132
+        },
+        {
+          "data": "2025-11-27",
+          "num_passos": 39
+        },
+        {
+          "num_passos": 123,
+          "data": "2025-11-29"
+        },
+        {
+          "num_passos": 12,
+          "data": "2026-06-30"
+        }
+      ],
+      "estadoAtual": "balancando"
+    }
+  ]
+}
