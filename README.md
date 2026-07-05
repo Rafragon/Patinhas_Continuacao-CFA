@@ -81,3 +81,11 @@ Funciona de forma contínua usando uma arquitetura baseada em **Sockets TCP puro
 1. O ESP32 abre um servidor TCP focado na porta `80`.
 2. O script Python de coleta conecta-se diretamente ao endereço IP do dispositivo.
 3. Uma vez estabelecido o handshake, o ESP32 envia continuamente strings formatadas em formato CSV (`accX,accY,accZ,gyroX,gyroY,gyroZ\n`) respeitando rigorosamente o intervalo de 20ms (50Hz), permitindo que o computador armazene o histórico bruto para retreinar o modelo de Inteligência Artificial.
+
+## 5.Referências Externas
+
+* **Estudo de base (Passometria veterinária):** [Use of pedometers to measure physical activity in dogs](https://avmajournals.avma.org/view/journals/javma/226/12/javma.2005.226.2010.xml?tab_body=pdf)
+* **Documentação do Microcontrolador:** [ESP32-C3 0.42 OLED - Kevin's Blog](https://emalliab.wordpress.com/2025/02/12/esp32-c3-0-42-oled/)
+* **Biblioteca do Sensor (C++):** [MPU9250 por hideakitai](https://github.com/hideakitai/MPU9250)
+* **Biblioteca do Display (C++):** [U8g2lib por olikraus](https://github.com/olikraus/u8g2)
+* **Repositório da Disciplina Original:** [CFA - Prof. Fábio Nakano](https://github.com/FNakano/CFA)
