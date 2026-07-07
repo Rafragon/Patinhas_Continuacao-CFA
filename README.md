@@ -17,12 +17,6 @@ O dispositivo físico foi projetado com um design minimalista, focado em leveza 
 | Invólucro | Case plástica com velcro | Proteção do circuito, isolamento elétrico e acoplamento seguro na coleira do pet. |
 | Placa Base | Placa de circuito universal | Soldagem estrutural com pinos fêmea (permitindo a troca e reutilização do microcontrolador e sensores). |
 
-### Barramento de Comunicação Interna (I2C)
-A comunicação entre o ESP32-C3, o sensor IMU e o display OLED é realizada através do barramento físico I2C soldado na placa universal. Os pinos lógicos mapeados são:
-* **SDA (Dados):** Pino GPIO 5
-* **SCL (Clock):** Pino GPIO 6
-* **Endereço do MPU9250:** 0x68 (padrão I2C)
-
 ---
 
 ## 2. Inicialização e Conexão de Rede (Protocolos)
