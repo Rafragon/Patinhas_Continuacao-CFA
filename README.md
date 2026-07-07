@@ -3,7 +3,7 @@
 Este documento detalha o funcionamento interno, a eletrônica, os algoritmos embarcados e os protocolos de comunicação do dispositivo IoT (coleira inteligente). Esta implementação é uma evolução direta do [Patinhas](https://github.com/willianjsf/Patinhas-CFA/tree/main), estendendo as funcionalidades de hardware e contagem de passos com modelos de Machine Learning para classificação comportamental na borda.
 ---
 
-## 1. Arquitetura de Hardware e Conexões
+## 1. Arquitetura de Hardware
 
 O dispositivo físico foi projetado com um design minimalista, focado em leveza e reaproveitamento de materiais. Ele é construído com base nos seguintes componentes e reciclados:
 
