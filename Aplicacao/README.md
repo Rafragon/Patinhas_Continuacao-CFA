@@ -1,4 +1,4 @@
-# Sistema Patinhas-CFA - Documentação da Aplicação
+# Sistema Patinhas-CFA - Documentação geral da Aplicação
 
 Este repositório contém a atualização da infraestrutura de software do projeto Patinhas-CFA, compreendendo o backend em Flask, o frontend em React Native (Expo) e os algoritmos de processamento de sinais e Inteligência Artificial embarcados.
 
