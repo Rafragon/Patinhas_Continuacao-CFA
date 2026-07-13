@@ -82,4 +82,5 @@ Funciona de forma contínua usando uma arquitetura baseada em **Sockets TCP puro
 * **Documentação do Microcontrolador:** [ESP32-C3 0.42 OLED - Kevin's Blog](https://emalliab.wordpress.com/2025/02/12/esp32-c3-0-42-oled/)
 * **Biblioteca do Sensor (C++):** [MPU9250 por hideakitai](https://github.com/hideakitai/MPU9250)
 * **Biblioteca do Display (C++):** [U8g2lib por olikraus](https://github.com/olikraus/u8g2)
+* **Biblioteca do Administrador de Wifi (C++):** [WiFiManager por tzapu](https://github.com/tzapu/WiFiManager)
 * **Repositório da Disciplina Original:** [CFA - Prof. Fábio Nakano](https://github.com/FNakano/CFA)
