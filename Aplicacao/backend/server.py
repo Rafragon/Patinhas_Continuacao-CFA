@@ -199,7 +199,7 @@ def handle_estado_post():
 
         dados = carregar_dados()
         # Cria ou atualiza o campo de estado atual do primeiro pet
-        # dados["pets"][0]["estadoAtual"] = estado_recebido
+        dados["pets"][0]["estadoAtual"] = estado_recebido
         
         pet = dados["pets"][0]
         hoje = date.today().strftime("%Y-%m-%d")
