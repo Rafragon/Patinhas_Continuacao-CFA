@@ -24,6 +24,13 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="monitoramento"
+        options={{
+          title: 'Monitoramento de atividade',
+          tabBarIcon: ({ color }) => <Ionicons size={28} name='analytics' color={color} />,
+        }}
+      />
+      <Tabs.Screen
         name="newDevice"
         options={{
           title: 'Novo Dispositivo',

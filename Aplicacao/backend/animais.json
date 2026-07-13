@@ -48,9 +48,96 @@
         {
           "num_passos": 12,
           "data": "2026-06-30"
+        },
+        {
+          "num_passos": 79,
+          "data": "2026-07-08"
+        },
+        {
+          "data": "2026-07-10",
+          "num_passos": 31
         }
       ],
-      "estadoAtual": "balancando"
+      "estados": [
+        {
+          "data": "2025-11-11",
+          "correndo": 10,
+          "andando": 30,
+          "parado": 50,
+          "se_cocando": 10
+        },
+        {
+          "data": "2025-11-12",
+          "correndo": 10,
+          "andando": 30,
+          "parado": 50,
+          "se_cocando": 10
+        },
+        {
+          "data": "2025-11-13",
+          "correndo": 10,
+          "andando": 30,
+          "parado": 50,
+          "se_cocando": 10
+        },
+        {
+          "data": "2025-11-14",
+          "correndo": 10,
+          "andando": 30,
+          "parado": 50,
+          "se_cocando": 10
+        },
+        {
+          "data": "2025-11-15",
+          "correndo": 10,
+          "andando": 30,
+          "parado": 50,
+          "se_cocando": 10
+        },
+        {
+          "data": "2025-11-26",
+          "correndo": 10,
+          "andando": 30,
+          "parado": 50,
+          "se_cocando": 0
+        },
+        {
+          "data": "2025-11-27",
+          "correndo": 10,
+          "andando": 30,
+          "parado": 50,
+          "se_cocando": 0
+        },
+        {
+          "data": "2025-11-29",
+          "correndo": 10,
+          "andando": 30,
+          "parado": 50,
+          "se_cocando": 10
+        },
+        {
+          "data": "2026-06-30",
+          "correndo": 10,
+          "andando": 30,
+          "parado": 50,
+          "se_cocando": 10
+        },
+        {
+          "data": "2026-07-08",
+          "correndo": 2,
+          "andando": 42,
+          "parado": 0,
+          "se_cocando": 0
+        },
+        {
+          "data": "2026-07-10",
+          "correndo": 32,
+          "andando": 165,
+          "parado": 324,
+          "se_cocando": 0
+        }
+      ],
+      "estadoAtual": "andando"
     }
   ]
 }

@@ -108,8 +108,8 @@ def handle_post():
         if diaEncontrado == False:
             print(f"   ℹ Dia não encontrado - Criando novo registro")
             novoDia = {
-                "num_passos": int(passosRecentes),
-                "data": hoje
+                "data": hoje,
+                "num_passos": int(passosRecentes)
             }
             dados["pets"][0]["passos"].append(novoDia)
             print(f"   ✓ Novo dia adicionado com {passosRecentes} passos")
@@ -124,69 +124,69 @@ def handle_post():
 
 @app.route('/', methods=['GET'])
 def handle_get():
-    print(f"📤 GET recebido")
+    # print(f"📤 GET recebido")
     try:
         ultimo = str(ultimo_passo())
-        print(f"   Último passo: {ultimo}")
-        print(f"✓ GET respondido\n")
+        # print(f"   Último passo: {ultimo}")
+        # print(f"✓ GET respondido\n")
         return ultimo, 200
     except Exception as e:
-        print(f"✗ Erro ao processar GET: {e}\n")
+        # print(f"✗ Erro ao processar GET: {e}\n")
         return "ERRO", 500
 
 
 @app.route('/animalInfo', methods=['GET'])
 def get_animal_info():
-    print(f"📤 GET /animalInfo recebido")
+    # print(f"📤 GET /animalInfo recebido")
     try:
         dados = carregar_dados()
 
         if not dados:
-            print(f"✗ Banco de dados vazio")
+            # print(f"✗ Banco de dados vazio")
             return jsonify({"erro": "Banco de dados vazio."}), 400
 
         num_pets = len(dados.get("pets", []))
-        print(f"   ✓ Retornando informações de {num_pets} pet(s)")
-        print(f"✓ GET /animalInfo respondido\n")
+        # print(f"   ✓ Retornando informações de {num_pets} pet(s)")
+        # print(f"✓ GET /animalInfo respondido\n")
         return jsonify({
             "dados": dados["pets"]
         }), 200
     except Exception as e:
-        print(f"✗ Erro ao processar GET /animalInfo: {e}\n")
+        # print(f"✗ Erro ao processar GET /animalInfo: {e}\n")
         return jsonify({"erro": f"Erro ao processar requisição: {e}"}), 500
 
 
 @app.route('/passosDia', methods=['GET'])
 def get_passos_dia():
-    print(f"📤 GET /passosDia recebido")
+    # print(f"📤 GET /passosDia recebido")
     try:
         dados = carregar_dados()
         pet = dados["pets"][0]
 
         dia = request.args.get('dia')
-        print(f"   Data solicitada: {dia}")
+        # print(f"   Data solicitada: {dia}")
 
         if not dia:
-            print(f"✗ Parâmetro 'dia' não fornecido")
+            # print(f"✗ Parâmetro 'dia' não fornecido")
             return jsonify({"erro": "Parâmetro 'dia' é obrigatório."}), 400
 
         for item in pet["passos"]:
             if item["data"] == dia:
-                print(f"   ✓ Registro encontrado: {item['num_passos']} passos")
-                print(f"✓ GET /passosDia respondido\n")
+                # print(f"   ✓ Registro encontrado: {item['num_passos']} passos")
+                # print(f"✓ GET /passosDia respondido\n")
                 return jsonify({
                     "data": dia,
                     "num_passos": item["num_passos"]
                 }), 200
 
         # Se não encontrar a data
-        print(f"✗ Nenhum registro encontrado para {dia}")
-        print(f"✓ GET /passosDia respondido (404)\n")
+        # print(f"✗ Nenhum registro encontrado para {dia}")
+        # print(f"✓ GET /passosDia respondido (404)\n")
         return jsonify({
             "erro": f"Nenhum registro encontrado para a data {dia}"
         }), 404
     except Exception as e:
-        print(f"✗ Erro ao processar GET /passosDia: {e}\n")
+        # print(f"✗ Erro ao processar GET /passosDia: {e}\n")
         return jsonify({"erro": f"Erro ao processar requisição: {e}"}), 500
 
 
@@ -199,8 +199,37 @@ def handle_estado_post():
 
         dados = carregar_dados()
         # Cria ou atualiza o campo de estado atual do primeiro pet
-        dados["pets"][0]["estadoAtual"] = estado_recebido
-        salvar_dados(dados)
+        # dados["pets"][0]["estadoAtual"] = estado_recebido
+        
+        pet = dados["pets"][0]
+        hoje = date.today().strftime("%Y-%m-%d")
+        print(f"   Data atual: {hoje}")
+
+        diaEncontrado = False
+
+        for item in pet["estados"]:
+            if item["data"] == hoje:
+                diaEncontrado = True
+                valorAntigoDoEstado = item[estado_recebido]
+                valorNovoDoEstado = valorAntigoDoEstado + 1
+                print(
+                    f"   ✓ Dia encontrado! {valorAntigoDoEstado} + 1 = {valorNovoDoEstado} para o estado {estado_recebido}")
+                item[estado_recebido] = valorNovoDoEstado
+                salvar_dados(dados)
+                break
+
+        if diaEncontrado == False:
+            print(f"   ℹ Dia não encontrado - Criando novo registro")
+            novoDia = {
+                "data": hoje,
+                "correndo": 0,
+                "andando": 0,
+                "parado": 0,
+                "se_cocando": 0
+            }
+            dados["pets"][0]["estados"].append(novoDia)
+            print(f"   ✓ Novo dia adicionado com estados zerados")
+            salvar_dados(dados)
 
         print(f"✓ POST /estado processado com sucesso\n")
         return "OK", 200
@@ -211,20 +240,20 @@ def handle_estado_post():
 
 @app.route('/estado', methods=['GET'])
 def get_estado():
-    print(f"📤 GET /estado recebido")
+    # print(f"📤 GET /estado recebido")
     try:
         dados = carregar_dados()
         # Retorna o estado atual ou "desconhecido" caso ainda não tenha recebido dados
         estado = dados["pets"][0].get("estadoAtual", "desconhecido")
 
-        print(f"   ✓ Retornando estado: {estado}")
-        print(f"✓ GET /estado respondido\n")
+        # print(f"   ✓ Retornando estado: {estado}")
+        # print(f"✓ GET /estado respondido\n")
 
         return jsonify({
             "estado": estado
         }), 200
     except Exception as e:
-        print(f"✗ Erro ao processar GET /estado: {e}\n")
+        # print(f"✗ Erro ao processar GET /estado: {e}\n")
         return jsonify({"erro": f"Erro ao processar requisição: {e}"}), 500
 
 
