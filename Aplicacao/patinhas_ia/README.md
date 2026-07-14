@@ -58,7 +58,7 @@ A leitura dos dados não utiliza bloqueios comuns de delay. O fluxo é condicion
 O acelerômetro MPU9250 é lido nos três eixos (X, Y e Z) com escala de $\pm2G$. O giroscópio opera na escala de $\pm250$ graus por segundo.
 
 1.  **Cálculo de Magnitude:** Os vetores individuais são combinados para encontrar a magnitude vetorial absoluta:
-    $$A = \sqrt{rawAccX^2 + rawAccY^2 + rawAccZ^2}$$
+    $$A = \sqrt{AccX^2 + AccY^2 + AccZ^2}$$
 2.  **Filtro:** Um filtro de média móvel com janela de 3 amostras é aplicado ao valor $A$ para suavizar ruídos mecânicos de alta frequência.
 3.  **Máquina de Estados:** Um passo é validado se a magnitude filtrada ultrapassar o limiar de impacto ($1.2G$) e, subsequentemente, cair abaixo do limiar de repouso ($0.95G$).
 4.  **Bloqueio por Rotação:** Se a magnitude do giroscópio exceder o limiar de $100.0$ graus por segundo, o incremento de passos entra em um período de espera (cooldown) de 500 milissegundos para evitar a contabilização de movimentos anômalos, como o chacoalhar do animal. 
