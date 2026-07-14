@@ -1,50 +1,33 @@
-# Welcome to your Expo app 👋
+# Detalhamento do Frontend (React Native Web)
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+O código-fonte atua como o painel de controle do tutor. Construído com o ecossistema React Native em conjunto com o framework Expo, o projeto está atualmente sendo testado e executado em sua versão Web (website), embora possua arquitetura híbrida compatível com futura compilação móvel.
 
-## Get started
+## 1. Arquitetura e Configurações Base
 
-1. Install dependencies
+O aplicativo segue uma arquitetura modular orientada a componentes funcionais.
 
-   ```bash
-   npm install
-   ```
+*   **Roteamento (Navegação):** O sistema de rotas é gerenciado pelo **Expo Router**. A estrutura principal foi organizada através de abas (Tabs), adaptadas para a visualização no navegador.
+*   **Compatibilidade Web:** O projeto utiliza a biblioteca `react-native-web` para traduzir os componentes nativos para elementos DOM (HTML/CSS). O arquivo de configuração do Expo define o output da versão web como estático. A identidade visual padroniza as fontes da família `Montserrat`.
 
-2. Start the app
+## 2. Comunicação de Rede e Polling
 
-   ```bash
-   npx expo start
-   ```
+A arquitetura de obtenção de dados utiliza um modelo de Polling.
 
-In the output, you'll find options to open the app in a
+*   **Resolução de IP:** O hook customizado isola a lógica de ambiente. Na execução web/desktop atual, ele identifica o sistema operacional e retorna `127.0.0.1` para conectar-se ao servidor Flask rodando localmente na máquina.
+*   **Sincronização Contínua:** O componente de status executa a instrução `setInterval` para disparar conexões HTTP de leitura a cada 2000 milissegundos (2 segundos). Isso atualiza simultaneamente a volumetria de passos e a classificação da inteligência artificial.
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+## 3. Lógica de Negócio e Heurísticas
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+Regras matemáticas de uso veterinário estão encapsuladas no módulo do Estimador.
 
-## Get a fresh project
+*   **Fórmula do Passo Ideal:** Calcula o gasto energético necessário com base no peso e porte do cachorro, aplicando multiplicadores condicionais (nível de energia, idade, ambiente, saúde). Devolve um alvo customizado com margem de segurança de ±15%.
+*   **Análise Estatística:** Agrupa o histórico JSON enviado pelo servidor e calcula a média de movimentação, com filtragem retroativa por dias específicos.
 
-When you're ready, run:
+## 4. Visualização de Dados e Telas Principais
 
-```bash
-npm run reset-project
-```
+A interface utiliza componentes gráficos da biblioteca `react-native-chart-kit` renderizados no navegador.
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+*   **Dashboard em Tempo Real:** Renderiza informações estáticas do pet associadas à barra de progressão diária. O status de ação detectado pela IA é exibido em destaque.
+*   **Análise Histórica de Passos:** Monta um gráfico de barras (`BarChart`) com os dados quantitativos dos últimos 5 dias.
+*   **Monitoramento Comportamental (IA):** Visualiza as inferências em um gráfico de barras empilhadas (`StackedBarChart`), exibindo a proporção percentual diária dos estados ("Correndo", "Andando", "Parado", "Coçando").
+*   **Restrição de Provisionamento IoT (Atenção Web):** A tela dedicada ao pareamento Bluetooth utiliza a biblioteca nativa `react-native-ble-plx`. Durante a fase de testes em ambiente Web, este módulo não possui acesso direto ao rádio Bluetooth sem o uso específico da Web Bluetooth API, limitando seu funcionamento estritamente ao layout no navegador.
