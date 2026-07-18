@@ -7,12 +7,16 @@
 #include <WiFiUdp.h>
 #include "ModeloPatinhas.h" 
 #include <WiFiManager.h>
+#include <WebServer.h>
 
 // Bibliotecas do FreeRTOS
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 #include <freertos/semphr.h>
 #include <freertos/queue.h>
+
+// ========= PINO DA BATERIA =========
+#define PINO_BATERIA 1
 
 // ========= SINCRONIZAÇÃO FREERTOS =========
 SemaphoreHandle_t mutexI2C;
@@ -22,6 +26,7 @@ TaskHandle_t handleTaskIA;
 // ========= CONFIGURAÇÕES DE REDE =========
 WiFiUDP udp;
 const int broadcastPort = 50000;
+WebServer serverESP(80);
 
 // ========= VARIÁVEIS DO SERVIDOR =========
 bool serverEncontrado = false;
@@ -47,6 +52,26 @@ float buffersIA[2][TAMANHO_JANELA][6];
 volatile int bufferPreenchimento = 0;
 volatile int bufferProcessamento = 0;
 volatile int indiceIA = 0;
+
+// ========= LEITOR DE BATERIA =========
+int lerBateria() {
+    int leituraRaw = analogRead(PINO_BATERIA);
+    
+    // Imprime o valor bruto para debug no cabo USB
+    Serial.print("Leitura Bruta Bateria: ");
+    Serial.println(leituraRaw);
+    
+    // map(valor_atual, limite_inferior, limite_superior, saida_min, saida_max)
+    // 1700 -> Aprox. tensão de corte onde o ESP32 desliga
+    // 2400 -> Valor estimado para bateria cheia no seu hardware
+    int porcentagem = map(leituraRaw, 1700, 2400, 0, 100);
+    
+    // Trava os limites entre 0 e 100
+    if (porcentagem > 100) porcentagem = 100;
+    if (porcentagem < 0) porcentagem = 0;
+    
+    return porcentagem;
+}
 
 // ========= ALGORITMO DE PASSOS =========
 const int TAMANHO_FILTRO = 3;
@@ -124,6 +149,30 @@ void sendEstadoPost(String estado) {
     http.POST(estado);
     http.end();
   }
+}
+
+void sendBateriaPost(int porcentagem) {
+    if (WiFi.status() == WL_CONNECTED) {
+        HTTPClient http;
+        String url = "http://" + String(serverIP) + ":8080/bateria";
+        
+        http.begin(url);
+        http.addHeader("Content-Type", "text/plain");
+        http.POST(String(porcentagem));
+        http.end();
+    }
+}
+
+void sendIpColeiraPost(String ipColeira) {
+    if (WiFi.status() == WL_CONNECTED) {
+        HTTPClient http;
+        String url = "http://" + String(serverIP) + ":8080/ipColeira";
+        
+        http.begin(url);
+        http.addHeader("Content-Type", "text/plain");
+        http.POST(ipColeira);
+        http.end();
+    }
 }
 
 // ========= TASK 1: SENSOR E PASSOS (PRIORIDADE ALTA) =========
@@ -209,6 +258,7 @@ void taskSensor(void *pvParameters) {
 
 // ========= TASK 2: IA E REDE (PRIORIDADE BAIXA) =========
 void taskIA_Rede(void *pvParameters) {
+  static int contadorBateria = 0;
   for(;;) {
     int passoMsg;
     // Dispara requisições pendentes da contagem de passos
@@ -242,7 +292,14 @@ void taskIA_Rede(void *pvParameters) {
       Serial.print("Estado detetado: ");
       Serial.println(estadoAtual);
       sendEstadoPost(estadoAtual);
-    }
+
+      contadorBateria++;
+        if (contadorBateria >= 30) { 
+            int bateriaAtual = lerBateria();
+            sendBateriaPost(bateriaAtual);
+            contadorBateria = 0; // Reseta o contador
+        }
+    } 
   }
 }
 
@@ -264,6 +321,26 @@ void taskDisplay(void *pvParameters) {
   }
 }
 
+// ========= TASK 4: SERVIDOR DE COMANDOS =========
+void taskServidorESP(void *pvParameters) {
+  serverESP.on("/reset", []() {
+    serverESP.send(200, "text/plain", "Limpando credenciais...");
+    
+    WiFiManager wifiManager;
+    wifiManager.resetSettings(); // Apaga o Wi-Fi atual salvo
+    
+    delay(1000);
+    ESP.restart(); // Reinicia a placa para forçar a abertura do Patinhas-Config
+  });
+  
+  serverESP.begin();
+
+  for(;;) {
+    serverESP.handleClient();
+    vTaskDelay(pdMS_TO_TICKS(50));
+  }
+}
+
 void setup() {
   Serial.begin(115200);
   Wire.begin(5, 6);
@@ -282,6 +359,31 @@ void setup() {
 
   WiFiManager wifiManager;
   wifiManager.setAPCallback(configModeCallback);
+
+  // Injeção de HTML e CSS customizado
+  String css = "<style>"
+               "body { font-family: 'Montserrat', sans-serif; background-color: #2c3e50; color: white; }"
+               ".wrap { max-width: 400px; margin: auto; padding: 20px; }"
+               ".c, .q { background-color: #34495e; border-radius: 10px; border: 1px solid #7f8c8d; }"
+               "button { background-color: #27ae60; color: white; border: none; border-radius: 5px; padding: 10px 20px; font-weight: bold; width: 100%; margin-top: 10px; cursor: pointer; }"
+               "input { border-radius: 5px; border: none; padding: 10px; margin-bottom: 10px; width: 100%; box-sizing: border-box; }"
+               "input[type=text], input[type=password] { background-color: #ecf0f1; color: #2c3e50; }"
+               "h1 { color: #f1c40f; text-align: center; margin-bottom: 20px; }"
+               "a { color: #3498db; text-decoration: none; }"
+               ".msg { font-size: 14px; text-align: center; margin-bottom: 20px; color: #bdc3c7; }"
+               "</style>";
+  
+  // Importação da fonte Montserrat do Google Fonts
+  String font = "<link href='https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap' rel='stylesheet'>";
+
+  // Inserindo na estrutura do WiFiManager
+  String customHead = font + css;
+  wifiManager.setCustomHeadElement(customHead.c_str());
+
+  // Alterando o título do menu principal
+  wifiManager.setCustomMenuHTML("<div class='msg'>Conecte a coleira Patinhas à sua rede Wi-Fi para enviar os dados.</div>");
+  std::vector<const char*> menu = {"wifi", "info", "exit"};
+  wifiManager.setMenu(menu); // Remove opções desnecessárias
 
   if (!wifiManager.autoConnect("Patinhas-Config")) {
     Serial.println("Falha ao conectar. Reiniciando...");
@@ -323,6 +425,11 @@ void setup() {
   xTaskCreate(taskSensor, "Sensor", 4096, NULL, 3, NULL);
   xTaskCreate(taskIA_Rede, "IA_Rede", 8192, NULL, 1, &handleTaskIA);
   xTaskCreate(taskDisplay, "Display", 2048, NULL, 2, NULL);
+
+  // Envia o IP para o Python assim que liga
+  sendIpColeiraPost(WiFi.localIP().toString()); 
+  // Inicia o servidor interno do ESP32 para escutar o reset
+  xTaskCreate(taskServidorESP, "ServidorESP", 4096, NULL, 1, NULL);
 }
 
 void loop() {
