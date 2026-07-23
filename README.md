@@ -92,9 +92,9 @@ O dispositivo opera orientado a eventos, estruturando sessões estritas e encerr
 <p align=center>
   <img src="imagens/gif1.gif"/>
   <img src="imagens/gif2.gif"/>
-  <img src="imagens/angulo_1.jpeg"/>
-  <img src="imagens/angulo_2.jpeg"/>
-  <img src="imagens/angulo_3.jpeg"/>
+  <img src="imagens/angulo_1.jpeg",  width="200"/> 
+  <img src="imagens/angulo_2.jpeg", width="200"/>
+  <img src="imagens/angulo_3.jpeg", width="200"/>
 </p>
 
 
