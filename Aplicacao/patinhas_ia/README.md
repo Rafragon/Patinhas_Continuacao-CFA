@@ -11,10 +11,7 @@ O sistema utiliza o barramento I2C para comunicação com os periféricos, multi
 *   **Display:** OLED SSD1306 0.42''.
 *  **Sensor Inercial:** MPU9250.
 <p align=center>
-  <img src="../../imagens/esp32c3supermini.png", width="200"/>
-</p>
-
-<p align=center>
+  <img src="../../imagens/esp32c3supermini.png", width="300"/>
   <img src="../../imagens/mpu9250.png", width="200"/>
 </p>
 
