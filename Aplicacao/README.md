@@ -87,7 +87,7 @@ Responsável por mapear se o animal está estacionário ou realizando movimentos
 
 ### Passo 1: Inicializar a Coleira (Arduino)
 1. Espere o ESP32 se conectar ao Wifi.
-2. Se ele não se conectar, acesse o Access Point criado por ele chamado de "Patinhas-Config" e conecte o Wifi desejado através dela no ESP32 (o mesmo Wifi do computador que será utilizado).
+2. Caso o dispositivo não se conecte automaticamente, ele criará um Access Point temporário. Conecte-se à rede Wi-Fi Patinhas-Config, abra o navegador e acesse [http://192.168.4.1](http://192.168.4.1) (em muitos casos, a página de configuração abrirá automaticamente). No portal, insira as credenciais da sua rede local, certificando-se de escolher a mesma rede Wi-Fi em que o computador (servidor) está executando.
 3. Após conectar com sucesso à rede local, a placa executa o envio de seu IP local para o servidor Python.
 
 ### Passo 2: Inicializar o Backend
@@ -113,7 +113,7 @@ Responsável por mapear se o animal está estacionário ou realizando movimentos
 
 ### Passo 1: Inicializar a Coleira (Arduino)
 1. Espere o ESP32 se conectar ao Wi-Fi.
-2. Se ele não se conectar, acesse o Access Point criado por ele chamado de "Patinhas-Config" e conecte o Wi-Fi desejado através dela no ESP32 (o mesmo Wi-Fi do computador que será utilizado).
+2. Caso o dispositivo não se conecte automaticamente, ele criará um Access Point temporário. Conecte-se à rede Wi-Fi Patinhas-Config, abra o navegador e acesse [http://192.168.4.1](http://192.168.4.1) (em muitos casos, a página de configuração abrirá automaticamente). No portal, insira as credenciais da sua rede local, certificando-se de escolher a mesma rede Wi-Fi em que o computador (servidor) está executando.
 3. Após conectar com sucesso à rede local, a placa executa o envio de seu IP local para o servidor Python.
 
 ### Passo 2: Inicializar o Backend e Configurar Rede
