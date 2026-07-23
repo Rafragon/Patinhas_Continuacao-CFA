@@ -71,7 +71,7 @@ Para otimizar o consumo de energia, isolar o hardware de instabilidades de rede 
 ### 3.4. Monitoramento de Bateria
 1. **Isolamento do Rádio:** A leitura analógica mapeia obrigatoriamente para o GPIO 2, pertencente ao conversor ADC1, visto que o conversor ADC2 é desativado fisicamente no ESP32-C3 quando o módulo Wi-Fi entra em operação.
 2. **Mapeamento e Contenção:** O sinal bruto é convertido para uma métrica percentual utilizando limites empíricos. O código trava os resultados via condicionais de contenção para evitar envios numéricos corrompidos.
-3. **Média Aritmética e Estabilização:**Durante a leitura, o processamento captura 10 amostras sequenciais com micropausas de 2 milissegundos. Isso permite que o multiplexador do ADC dissipe ruídos eletromagnéticos residuais, gerando uma média estabilizada.
+3. **Média Aritmética e Estabilização:** Durante a leitura, o processamento captura 10 amostras sequenciais com micropausas de 2 milissegundos. Isso permite que o multiplexador do ADC dissipe ruídos eletromagnéticos residuais, gerando uma média estabilizada.
 4. **Amostragem Desacoplada:** A leitura múltipla e a transmissão da bateria ocorrem em um ciclo acumulador mais lento (a cada 60 segundos), executando o laço no tempo ocioso da rede para otimizar o tráfego HTTP.
 
 ---
