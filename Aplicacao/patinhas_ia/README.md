@@ -54,6 +54,7 @@ Para isolar o hardware de instabilidades de rede e manter a amostragem inercial 
 *   **Task 1: Sensor (Prioridade Alta):** Aloca 4096 bytes de Stack. Executa a leitura do acelerômetro e do giroscópio exatamente a cada 20ms utilizando `vTaskDelayUntil`. Contém a heurística de filtro de média móvel para detecção e contagem de passos.
 *   **Task 2: IA e Rede (Prioridade Baixa):** Aloca 8192 bytes de Stack. Calcula as características estatísticas, submete os dados ao modelo Random Forest, avalia as métricas da bateria e executa as transmissões HTTP. Roda apenas utilizando o tempo ocioso do processador.
 *   **Task 3: Display (Prioridade Média):** Aloca 2048 bytes de Stack. Limpa o buffer e atualiza o display OLED a cada 100ms.
+*   **Task 4: Servidor Local ESP (Prioridade Baixa):** Mantém a porta HTTP aberta aguardando conexões de entrada na rede local. É responsável por escutar e processar comandos de controle enviados pelo aplicativo mobile, como a requisição no endpoint `/reset` para limpeza de credenciais e reinicialização do dispositivo.
 
 ---
 
