@@ -1,4 +1,3 @@
-```markdown
 # Detalhamento do Frontend (React Native - Web e Mobile)
 
 O código-fonte atua como o painel de controle do tutor. Construído com o ecossistema React Native em conjunto com o framework Expo, o projeto possui arquitetura híbrida compatível com execução no navegador (Web) e futura compilação móvel nativa.
