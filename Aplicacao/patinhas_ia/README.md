@@ -8,8 +8,20 @@ Este diretório contém o código-fonte em C++ para o microcontrolador ESP32-C3.
 
 O sistema utiliza o barramento I2C para comunicação com os periféricos, multiplexando os dados através de endereços físicos:
 *   **Microcontrolador:** ESP32-C3.
-*   **Sensor Inercial:** MPU9250 (Endereço I2C `0x68`).
-*   **Display:** OLED SSD1306 128x64 (Pinos: `SDA = 5`, `SCL = 6`).
+*   **Display:** OLED SSD1306 0.42''.
+*  **Sensor Inercial:** MPU9250.
+<p align=center>
+  <img src="../../imagens/esp32c3supermini.png"/>
+</p>
+
+<p align=center>
+  <img src="../../imagens/mpu9250.png", width="200"/>
+</p>
+
+Conexões feitas:
+<p align=center>
+  <img src="../../imagens/conexao_esp32c3.png"/>
+</p>
 
 ---
 
@@ -77,7 +89,7 @@ A matriz bidimensional que alimenta o classificador foi duplicada (`float buffer
 *   Esta técnica recicla posições físicas na SRAM com alocação estática. Evita-se a alocação dinâmica (`malloc`), prevenindo a fragmentação do heap (Heap Fragmentation). Ao final do processamento, o índice do array é resetado nativamente com a inversão da matriz ativa, eliminando riscos de Race Condition.
 
 ### 5.2. Mutex e Proteção de Barramento
-O sensor MPU9250 e o OLED SSD1306 compartilham eletricamente o mesmo barramento I2C. O firmware utiliza um Semáforo de Exclusão Mútua (`xSemaphoreCreateMutex`). A Task que solicitar acesso aos pinos tranca a comunicação, obrigando as demais threads a aguardarem a liberação. Isso previne colisões elétricas simultâneas que causariam o travamento do microcontrolador (Kernel Panic).
+O sensor MPU9250 e o OLED SSD1306 compartilham eletricamente o mesmo barramento I2C. O firmware utiliza um Semáforo de Exclusão Mútua (`xSemaphoreCreateMutex`). A Task que solicitar acesso aos pinos tranca a comunicação, obrigando as demais threads a aguardarem a liberação. Isso previne a corrupção do protocolo de comunicação e requisições sobrepostas na biblioteca, cenários que causariam o travamento do microcontrolador (Kernel Panic).
 
 ### 5.3. Filas Assíncronas (Queues)
 Os acionamentos de incremento de passos passam da Task do Sensor para a Task de Rede indiretamente, através de uma fila estruturada (`xQueueCreate`). A rotina do acelerômetro apenas envia o gatilho para a fila e retoma a amostragem em microssegundos, sem aguardar a latência do envio da requisição POST na rede.

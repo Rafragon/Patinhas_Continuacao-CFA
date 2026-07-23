@@ -1,5 +1,9 @@
 # Funcionamento Técnico do Dispositivo - Patinhas-CFA
 
+<p align=center>
+  <img src="imagens/capa.png"/>
+</p>
+
 Este documento detalha o funcionamento interno, a eletrônica, os algoritmos embarcados e os protocolos de comunicação do dispositivo IoT (coleira inteligente). Esta implementação é uma evolução direta do [Patinhas](https://github.com/willianjsf/Patinhas-CFA/tree/main), estendendo as funcionalidades de hardware e contagem de passos com modelos de Machine Learning para classificação comportamental na borda.
 
 ---
@@ -17,6 +21,11 @@ O dispositivo físico foi projetado com um design minimalista, focado em leveza 
 | Gerenciador de Carga | Módulo Li-po genérico | Proteção e recarregamento seguro da bateria via USB. (Reciclado). |
 | Invólucro | Case plástica com velcro | Proteção do circuito, isolamento elétrico e acoplamento seguro na coleira. |
 | Placa Base | Placa de circuito universal | Soldagem estrutural com pinos fêmea para troca de componentes. |
+
+<p align=center>
+  <img src="imagens/circuito_resultado.png"/>
+  <img src="imagens/demonstracao_case_.gif"/>
+</p>
 
 ---
 
@@ -78,7 +87,37 @@ O dispositivo opera orientado a eventos, estruturando sessões estritas e encerr
 
 ---
 
-## 5. Referências Externas
+## 5. Demonstração Em Funcionamento
+
+<p align=center>
+  <img src="imagens/gif1.gif"/>
+  <img src="imagens/gif2.gif"/>
+  <img src="imagens/angulo_1.jpeg"/>
+  <img src="imagens/angulo_2.jpeg"/>
+  <img src="imagens/angulo_3.jpeg"/>
+</p>
+
+
+---
+
+## 6. Problemas e Possíveis Melhorias
+
+**Problemas Identificados (Bugs)**
+* **Renderização de Estado:** Ocorreu uma inconsistência visual onde o estado comportamental atual do pet fica invisível na interface do aplicativo mobile, embora seja renderizado corretamente na versão web.
+<p align=center>
+  <img src="imagens/gif3.gif"/>
+</p>
+
+* **Instabilidade na Leitura da Bateria:** Apesar da implementação de um filtro de média aritmética com 10 amostras no firmware, o conversor analógico-digital (ADC) ainda apresenta flutuações. Isso resulta em leituras atípicas, onde o percentual de bateria indica aumento mesmo durante o processo de descarga.
+* **Falta de Reatividade na Interface:** A aba "Gráficos" não possui um mecanismo de recarregamento automático de estado acoplado à navegação, impedindo a atualização das informações em tempo real ao abrir a tela.
+
+**Possíveis Melhorias**
+* Resolução técnica dos problemas de interface e calibração de hardware citados acima.
+* **Suporte Multi-espécie:** Adicionar a funcionalidade de cadastro da espécie do animal no sistema, permitindo que a aplicação adapte os limiares matemáticos do contador de passos e o modelo preditivo da Inteligência Artificial de forma dinâmica para cada tipo de pet.
+
+---
+
+## 7. Referências Externas
 
 * **Estudo de base (Passometria veterinária):** [Use of pedometers to measure physical activity in dogs](https://avmajournals.avma.org/view/journals/javma/226/12/javma.2005.226.2010.xml?tab_body=pdf)
 * **Documentação do Microcontrolador:** [ESP32-C3 0.42 OLED - Kevin's Blog](https://emalliab.wordpress.com/2025/02/12/esp32-c3-0-42-oled/)
