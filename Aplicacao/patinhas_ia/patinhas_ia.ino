@@ -15,8 +15,10 @@
 #include <freertos/semphr.h>
 #include <freertos/queue.h>
 
-// ========= PINO DA BATERIA =========
-#define PINO_BATERIA 1
+// ========= CONFIGURAÇÕES DA BATERIA =========
+#define PINO_BATERIA 2
+#define LIMITE_INFERIOR 680
+#define LIMITE_SUPERIOR 860
 
 // ========= SINCRONIZAÇÃO FREERTOS =========
 SemaphoreHandle_t mutexI2C;
@@ -60,11 +62,9 @@ int lerBateria() {
     // Imprime o valor bruto para debug no cabo USB
     Serial.print("Leitura Bruta Bateria: ");
     Serial.println(leituraRaw);
-    
+
     // map(valor_atual, limite_inferior, limite_superior, saida_min, saida_max)
-    // 1700 -> Aprox. tensão de corte onde o ESP32 desliga
-    // 2400 -> Valor estimado para bateria cheia no seu hardware
-    int porcentagem = map(leituraRaw, 1700, 2400, 0, 100);
+    int porcentagem = map(leituraRaw, LIMITE_INFERIOR, LIMITE_SUPERIOR, 0, 100);
     
     // Trava os limites entre 0 e 100
     if (porcentagem > 100) porcentagem = 100;
@@ -294,11 +294,21 @@ void taskIA_Rede(void *pvParameters) {
       sendEstadoPost(estadoAtual);
 
       contadorBateria++;
-        if (contadorBateria >= 30) { 
-            int bateriaAtual = lerBateria();
-            sendBateriaPost(bateriaAtual);
-            contadorBateria = 0; // Reseta o contador
-        }
+      if (contadorBateria >= 30) { 
+          int somaBateria = 0;
+          const int NUM_AMOSTRAS = 10;
+          
+          // Realiza múltiplas leituras para estabilizar o valor
+          for (int i = 0; i < NUM_AMOSTRAS; i++) {
+              somaBateria += lerBateria();
+              vTaskDelay(pdMS_TO_TICKS(2)); // Micro-pausa para estabilização do ADC
+          }
+          
+          int bateriaMedia = somaBateria / NUM_AMOSTRAS;
+          sendBateriaPost(bateriaMedia);
+          
+          contadorBateria = 0; // Reseta o contador
+      }
     } 
   }
 }
@@ -320,6 +330,7 @@ void taskDisplay(void *pvParameters) {
     vTaskDelay(pdMS_TO_TICKS(INTERVALO_DISPLAY));
   }
 }
+
 
 // ========= TASK 4: SERVIDOR DE COMANDOS =========
 void taskServidorESP(void *pvParameters) {
@@ -343,6 +354,7 @@ void taskServidorESP(void *pvParameters) {
 
 void setup() {
   Serial.begin(115200);
+  pinMode(PINO_BATERIA, INPUT);
   Wire.begin(5, 6);
 
   u8g2.begin();
@@ -428,6 +440,10 @@ void setup() {
 
   // Envia o IP para o Python assim que liga
   sendIpColeiraPost(WiFi.localIP().toString()); 
+
+  // FORÇA A LEITURA IMEDIATA PARA TESTE
+  lerBateria();
+
   // Inicia o servidor interno do ESP32 para escutar o reset
   xTaskCreate(taskServidorESP, "ServidorESP", 4096, NULL, 1, NULL);
 }

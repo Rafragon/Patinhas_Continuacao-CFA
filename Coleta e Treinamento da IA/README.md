@@ -1,78 +1,76 @@
 # Sistema Patinhas-CFA - Coleta e Treinamento da Inteligência Artificial
 
-Este diretório contém os scripts necessários para capturar dados inerciais do ESP32-C3 e treinar o modelo de Machine Learning (Random Forest) que será embarcado na coleira inteligente.
+Este diretório contém os scripts necessários para capturar dados inerciais do ESP32-C3 e treinar o modelo de Machine Learning (Random Forest) embarcado na coleira inteligente. O fluxo de trabalho inclui coleta, segmentação em janelas temporais de 2 segundos, treinamento e conversão para código C++ estático.
 
 ---
 
-## 1. Visão Geral do Fluxo de Trabalho
+## 1. Dependências do Ambiente
 
-Para que a coleira consiga identificar autonomamente o que o animal está fazendo, o sistema precisa passar por um ciclo de aprendizado supervisionado:
-1. **Coleta de Dados:** O ESP32 envia dados brutos dos sensores de movimento para o computador, enquanto o animal executa uma ação específica.
-2. **Processamento:** O script em Python segmenta esses dados em janelas temporais de 2 segundos.
-3. **Treinamento:** O algoritmo `RandomForestClassifier` aprende a diferenciar os padrões de cada movimento.
-4. **Conversão (Edge AI):** O modelo validado é traduzido para código C++ (`ModeloPatinhas.h`) e incluído no firmware final do dispositivo.
+Para replicar a infraestrutura, instale os pacotes e bibliotecas listados abaixo.
+
+### 1.1. Dependências de Firmware (Arduino IDE)
+As seguintes bibliotecas devem ser instaladas na IDE para compilar o código do ESP32-C3:
+*   `Wire`: Nativa para comunicação I2C.
+*   `WiFi` e `WiFiManager`: Para gerenciamento de conexões sem fio e criação do portal cativo.
+*   `MPU9250`: Para leitura do acelerômetro e giroscópio.
+*   `U8g2`: Para interface visual no display OLED SSD1306.
+
+### 1.2. Dependências Python
+Instale os pacotes no ambiente virtual via terminal:
+```bash
+pip install -r requirements_tr.txt
+```
+*A biblioteca `pyserial` gerencia a coleta via cabo, enquanto o restante processa os dados e converte o modelo. O script de rede utiliza a biblioteca nativa `socket`.*
 
 ---
 
 ## 2. Estrutura dos Arquivos
 
-* `coleta_serial.py`: Script para coletar dados do ESP32 através de conexão via cabo USB.
-* `coleta_wifi.py`: Script para coletar dados do ESP32 através de rede Wi-Fi local via protocolo TCP (Recomendado para o pet se mover livremente).
-* `treinamento_ia.py`: Script responsável por ler os arquivos CSV coletados, treinar a floresta aleatória e exportar o modelo para a linguagem C++.
-* `coleta_serial.ino`: Firmware do ESP32 para enviar dados em alta frequência (50Hz) pela porta serial (cabo USB).
-* `coleta_wifi.ino`: Firmware do ESP32 para transmitir os dados inerciais via Wi-Fi a 50Hz, incluindo integração com o display OLED e WiFiManager.
-* `inferencia_local.ino`: Firmware de teste para validar o funcionamento do modelo de IA embarcado no microcontrolador, imprimindo os resultados no Monitor Serial.
+*   `coleta_serial.py`: Captura dados via porta serial (cabo USB).
+*   `coleta_wifi.py`: Captura dados via rede Wi-Fi local através de protocolo TCP.
+*   `treinamento_ia.py`: Lê os arquivos CSV, extrai características, treina o classificador e exporta a matriz C++.
+*   `coleta_serial.ino`: Firmware para amostragem e envio a 50Hz via USB.
+*   `coleta_wifi.ino`: Firmware para amostragem a 50Hz via Wi-Fi, gerando a rede `Patinhas-Coleta`.
+*   `inferencia_local.ino`: Firmware para testar o modelo treinado executando a predição na própria placa.
 
 ---
 
-## 3. Passo a Passo da Coleta de Dados
+## 3. Coleta de Dados Brutos
 
-Para cada comportamento que você deseja ensinar (ex: *parado*, *andando*, *correndo*, *se_cocando*), siga estas etapas:
+O sistema mapeia o comportamento do animal utilizando o cabeçalho estrito `accX,accY,accZ,gyroX,gyroY,gyroZ`.
 
-### 3.1. Preparando o Hardware
-1. Abra o arquivo `coleta_wifi.ino` na Arduino IDE.
-2. Certifique-se de que a opção "USB CDC On Boot" está como "Enabled" (se utilizar cabo) e faça o upload para o ESP32-C3.
-3. Ligue a coleira. Caso ela não encontre uma rede, criará um Access Point chamado `Patinhas-Coleta`. Conecte-se a ele pelo celular e insira a senha do seu Wi-Fi.
-4. O display OLED irá exibir o IP que a coleira obteve na rede local. Anote este IP.
+### 3.1. Calibração Inicial do Hardware
+Ambos os firmwares de coleta (`coleta_serial.ino` e `coleta_wifi.ino`) executam a função `mpu.calibrateAccelGyro()` no bloco `setup()`. O dispositivo deve ser mantido completamente imóvel durante a inicialização até que o display ou o terminal confirmem o fim da calibração.
 
-### 3.2. Gravando os Dados
-1. No seu computador, abra o arquivo `coleta_wifi.py` e altere a variável `IP_ESP32` para o IP mostrado no display da coleira.
-2. Altere a variável `NOME_DO_ARQUIVO` para refletir a ação que será gravada (ex: `dados_correndo.csv`). O tempo padrão de coleta é de 30 segundos.
-3. Execute o script no terminal: `python coleta_wifi.py`
-4. Estimule o animal a executar a ação desejada de forma contínua enquanto o script grava os dados brutos. O arquivo CSV será salvo na mesma pasta do script.
+### 3.2. Gravação via Wi-Fi (Recomendado)
+1. Faça o upload do arquivo `coleta_wifi.ino`.
+2. O ESP32 criará o Access Point `Patinhas-Coleta` se não localizar uma rede salva. Conecte-se e insira as credenciais do Wi-Fi local.
+3. O display OLED dividirá o IP obtido em duas linhas para facilitar a leitura.
+4. No arquivo `coleta_wifi.py`, configure as variáveis `IP_ESP32` com o IP exibido na tela, defina o `NOME_DO_ARQUIVO` (ex: `dados_correndo.csv`) e mantenha a porta TCP `80`.
+5. Execute o script com o comando `python coleta_wifi.py`. O socket abrirá a conexão e gravará os dados continuamente até o limite da variável `TEMPO_DE_COLETA` (padrão: 30 segundos).
 
-*(Nota: Caso prefira utilizar cabo, faça o upload de `coleta_serial.ino`, feche o monitor serial da IDE, configure a variável `PORTA_SERIAL` em `coleta_serial.py` e execute o script python.)*
-
----
-
-## 4. Treinamento e Conversão do Modelo
-
-Após coletar os arquivos CSV para todos os comportamentos desejados, é hora de treinar a Inteligência Artificial.
-
-1. **Organização:** Crie uma pasta chamada `dados` dentro deste diretório e mova todos os arquivos CSV gerados para lá.
-2. **Dependências:** Certifique-se de instalar as bibliotecas necessárias:
-```bash
-pip install -r requirements.txt
-```
-3. **Mapeamento:** Abra o arquivo `treinamento_ia.py` e verifique o dicionário `ARQUIVOS` para garantir que as chaves correspondam aos nomes dos seus arquivos na pasta `dados`.
-   ```python
-   ARQUIVOS = {
-       'parado': os.path.join(PASTA_DADOS, 'dados_parado.csv'),
-       'andando': os.path.join(PASTA_DADOS, 'dados_andando.csv'),
-       'correndo': os.path.join(PASTA_DADOS, 'dados_correndo.csv'),
-       'se_cocando': os.path.join(PASTA_DADOS, 'dados_se_cocando.csv')
-   }
-   ```
-4. **Execução:** Rode o script: `python treinamento_ia.py`
-5. **Resultado:** O console imprimirá a acurácia do modelo treinado. Um novo arquivo chamado `ModeloPatinhas.h` será gerado. Este arquivo contém a estrutura C++ estática da floresta aleatória.
+### 3.3. Gravação via Cabo Serial
+1. Faça o upload do arquivo `coleta_serial.ino` e feche o Monitor Serial da IDE.
+2. No script `coleta_serial.py`, defina a variável `PORTA_SERIAL` com a porta correspondente do sistema operacional e `BAUD_RATE` em `115200`.
+3. Execute `python coleta_serial.py`. O script descartará mensagens iniciais até reconhecer a string de cabeçalho `accX`, marcando o tempo zero para iniciar a escrita.
 
 ---
 
-## 5. Validação no Microcontrolador
+## 4. Processamento e Treinamento do Modelo
 
-Para garantir que o treinamento foi bem-sucedido e está funcionando no hardware:
+1. Crie um diretório chamado `dados` na mesma pasta do script de treinamento.
+2. Mova os arquivos CSV gravados para este diretório. O arquivo `treinamento_ia.py` busca explicitamente chaves correspondentes a `dados_parado.csv`, `dados_andando.csv`, `dados_correndo.csv` e `dados_se_cocando.csv`.
+3. Execute `python treinamento_ia.py`.
+4. **Extração de Características:** O código segmenta as linhas do CSV em blocos de 100 amostras (janelas exatas de 2 segundos em 50Hz). Para cada bloco, são extraídas 12 variáveis independentes: a média e o desvio padrão geométrico de cada um dos 6 eixos.
+5. O classificador `RandomForestClassifier` é treinado com 30 estimadores (`n_estimators=30`) e profundidade máxima de 10 (`max_depth=10`).
+6. A biblioteca `micromlgen` converte as matrizes de decisão resultantes e gera o arquivo `ModeloPatinhas.h` no diretório raiz.
 
-1. Mova o arquivo gerado `ModeloPatinhas.h` para a mesma pasta onde está o firmware `inferencia_local.ino`.
-2. Faça o upload do arquivo `inferencia_local.ino` para o ESP32-C3.
-3. Abra o Monitor Serial da Arduino IDE.
-4. Movimente o dispositivo enquanto ele está conectado no cabo USB; o microcontrolador irá agrupar as leituras e extrair a média e o desvio padrão a cada 2 segundos, inserindo-as no classificador e imprimindo o estado comportamental detetado diretamente na tela.
+---
+
+## 5. Validação Edge AI (Microcontrolador)
+
+1. Aloque o arquivo recém-gerado `ModeloPatinhas.h` na pasta do firmware `inferencia_local.ino`.
+2. Compile e transfira o código para a placa.
+3. O firmware criará uma matriz `leituras[100][6]` em memória. O acelerômetro gravará amostras a cada 20 milissegundos.
+4. Quando o índice atingir 100, a função `classificarMovimento()` processará as mesmas 12 características estatísticas locais (6 médias e 6 desvios).
+5. A função `modelo.predictLabel(features)` executará a árvore de decisão embarcada e imprimirá a string correspondente no Monitor Serial.

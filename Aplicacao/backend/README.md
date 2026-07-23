@@ -1,4 +1,4 @@
-# Detalhamento Backend Servidor 
+# Detalhamento Backend Servidor
 
 O código apresenta uma API desenvolvida em Python com o framework Flask. Ele atua como servidor central para gerenciar a autodescoberta de dispositivos e persistir os dados de telemetria enviados pelo hardware.
 
@@ -28,3 +28,6 @@ As rotas RESTful integram a comunicação entre o microcontrolador ESP32 (entrad
 *   **`GET /estado`:** Expõe o último comportamento classificado e implementa o valor `desconhecido` como retorno padrão caso o campo esteja vazio.
 *   **`GET /animalInfo`:** Consome o arquivo JSON e devolve a lista integral presente sob o array `pets` em formato serializado. Retorna erro HTTP 400 se a base estiver vazia.
 *   **`GET /passosDia`:** Requer a submissão do argumento `dia` na URL da requisição. Itera sobre o histórico procurando correspondência exata. Se encontrar, retorna a quantidade de passos; se falhar, retorna um erro HTTP 404.
+*   **`POST /bateria` (Atualização de Carga):** Recebe o valor percentual numérico da bateria em formato de texto e atualiza o campo `bateria` no perfil do primeiro pet presente no arquivo JSON.
+*   **`POST /ipColeira` (Registro de IP):** Recebe o endereço IP atribuído dinamicamente ao ESP32 e o salva no campo `ipColeira` do arquivo JSON.
+*   **`GET /ipColeira` (Recuperação de IP):** Lê o banco de dados e retorna o endereço IP salvo da coleira para o aplicativo móvel, emitindo um erro HTTP 404 caso a informação não exista.
