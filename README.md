@@ -67,7 +67,7 @@ Para otimizar o consumo de energia, isolar o hardware de instabilidades de rede 
 ### 3.3. Classificação Comportamental (Random Forest)
 1. **Janela Temporal:** O firmware agrupa 100 amostras consecutivas (2 segundos de movimento contínuo).
 2. **Extração Estatística:** Calcula a Média Aritmética e o Desvio Padrão para os 6 eixos, gerando um vetor de 12 características.
-3. **Inferência Local:** O vetor é submetido às árvores de decisão em C++ embarcada para classificar o comportamento ativo.
+3. **Inferência Local:** O vetor é submetido às árvores de decisão em C++ embarcadas para classificar o comportamento ativo.
 
 ### 3.4. Monitoramento de Bateria
 1. **Isolamento do Rádio:** A leitura analógica mapeia obrigatoriamente para o GPIO 2, pertencente ao conversor ADC1, visto que o conversor ADC2 é desativado fisicamente no ESP32-C3 quando o módulo Wi-Fi entra em operação.
