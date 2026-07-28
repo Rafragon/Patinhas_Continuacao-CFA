@@ -56,6 +56,7 @@ Para otimizar o consumo de energia, isolar o hardware de instabilidades de rede 
 * **Task de Sensor (Prioridade Alta):** Executa a leitura inercial a 50Hz exatos, aplica a heurística de passos e armazena os dados em um sistema de Double Buffering para evitar colisão de memória.
 * **Task de IA e Rede (Prioridade Baixa):** Processa as inferências do Random Forest na matriz secundária e executa requisições HTTP POST utilizando o tempo ocioso do processador.
 * **Task de Display (Prioridade Média):** Atualiza a tela OLED gerenciando o acesso ao barramento I2C através de um Semáforo Mutex, prevenindo conflitos elétricos com o MPU9250.
+* **Task de Servidor Local ESP (Prioridade Baixa):** Mantém a porta HTTP aberta aguardando conexões de entrada na rede local. É responsável por escutar e processar comandos de controle enviados pelo aplicativo mobile, como a requisição no endpoint /reset para limpeza de credenciais e reinicialização do dispositivo.
 
 ### 3.2. Heurística do Contador de Passos
 1. **Magnitude Escalar:** Calcula a aceleração resultante combinando os três eixos espaciais: $A = \sqrt{accX^2 + accY^2 + accZ^2}$.
